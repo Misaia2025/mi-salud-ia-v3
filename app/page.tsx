@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 // --- Supabase client ---
 import { supabase } from "@/lib/supabase"
+import LoginModal from "@/components/LoginModal";
 
 // ---------------------------------------------------------
 //  SUPABASE HELPERS: historial + control de tokens
@@ -172,6 +173,7 @@ interface Window {
 }
 
 export default function MiSaludIA() {
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>("welcome")
   const [isRecording, setIsRecording] = useState(false)
   const [chatInput, setChatInput] = useState("")
@@ -896,6 +898,9 @@ async function handleSubmit() {
     <div
       className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
     >
+      {/* ——— MODAL DE LOGIN ——— */}
+      <LoginModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
+
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 px-6 py-4 sticky top-0 z-50 dark:bg-slate-900/80 dark:border-slate-700/50">
         <div className="max-w-sm mx-auto flex items-center justify-between">
