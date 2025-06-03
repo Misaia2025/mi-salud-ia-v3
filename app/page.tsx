@@ -3,6 +3,70 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
+// --- Supabase client ---
+import { supabase } from "@/lib/supabase"
+
+// ---------------------------------------------------------
+//  SUPABASE HELPERS: historial + control de tokens
+// ---------------------------------------------------------
+async function getUserId(): Promise<string> {
+  // 1. ¿Está logueado?
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user?.id) return user.id
+
+  // 2. Si es anónimo, recicla o crea un ID local
+  let anon = localStorage.getItem("anon_id")
+  if (!anon) {
+    anon = `anon_${Date.now()}`
+    localStorage.setItem("anon_id", anon)
+  }
+  return anon
+}
+
+async function saveConsultation({
+  symptoms,
+  age,
+  sex,
+  conditions,
+  aiText
+}: {
+  symptoms: string
+  age: number
+  sex: string
+  conditions: string
+  aiText: string
+}) {
+  const uid = await getUserId()
+
+  // 1️⃣  Guarda la consulta en history
+  await supabase.from("history").insert({
+    user_id: uid,
+    symptoms,
+    age,
+    sex,
+    conditions,
+    ai_text: aiText
+  })
+
+  // 2️⃣  Incrementa el contador en tokens
+  // upsert = inserta si no existe, actualiza si existe
+  const { data, error } = await supabase
+    .from("tokens")
+    .upsert(
+      { user_id: uid, used: 1 },
+      { onConflict: "user_id", ignoreDuplicates: false, returning: "representation" }
+    )
+
+  if (error) {
+    console.error("Error actualizando tokens:", error.message)
+    return { used: 0 }
+  }
+
+  const used = data?.[0]?.used ?? 1
+  return { used } // cuántos lleva usados
+}
+
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
