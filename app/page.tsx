@@ -947,50 +947,52 @@ async function handleSubmit() {
 
 
     return (
-    <>
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-xl space-y-4 w-80">
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-              Inicia sesión
-            </h3>
+  <>
+    {/* ---- MODAL DE LOGIN ---- */}
+    {showLoginModal && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl space-y-4 w-80">
+          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+            Inicia sesión
+          </h3>
 
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault()
-                const email = (e.currentTarget.email as HTMLInputElement).value
-                if (email) {
-                  await signIn(email)
-                  setShowLoginModal(false)
-                }
-              }}
-              className="space-y-3"
-            >
-              <Input
-                name="email"
-                type="email"
-                placeholder="Tu correo"
-                required
-                className="w-full"
-              />
-              <Button type="submit" className="w-full">
-                Enviar enlace
-              </Button>
-            </form>
-
-            <Button
-              variant="ghost"
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              const email = (e.currentTarget.email as HTMLInputElement).value
+              if (email) {
+                await signIn(email)
+                setShowLoginModal(false)
+              }
+            }}
+            className="space-y-3"
+          >
+            <Input
+              name="email"
+              type="email"
+              placeholder="Tu correo"
+              required
               className="w-full"
-              onClick={() => setShowLoginModal(false)}
-            >
-              Cancelar
+            />
+            <Button type="submit" className="w-full">
+              Enviar enlace
             </Button>
-          </div>
-        </div>
-      )}
+          </form>
 
-      {/* ---- AQUÍ empieza tu interfaz principal ---- */}
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+          <Button
+            variant="ghost"
+            className="w-full"
+            onClick={() => setShowLoginModal(false)}
+          >
+            Cancelar
+          </Button>
+        </div>
+      </div>
+    )} {/* ← esta )} cierra el condicional; NO pongas nada más aquí */}
+
+    {/* ---- RESTO DE TU INTERFAZ ---- */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* …todo el JSX existente de tu app… */}
 
 
 
