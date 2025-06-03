@@ -6,7 +6,6 @@ import { useState, useEffect, useRef } from "react"
 // --- Supabase client ---
 import { supabase } from "@/lib/supabase"
 import type { User } from "@supabase/supabase-js"
-import { Input } from "@/components/ui/input"
 
 
 // --------- LOGIN / LOGOUT (magic link) ----------
