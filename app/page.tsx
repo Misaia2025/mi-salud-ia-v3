@@ -1624,6 +1624,15 @@ async function handleSubmit() {
           </div>
         )}
 
+{/* Loading Screen */}
+{currentScreen === "loading" && (
+  <div className="flex flex-col items-center justify-center py-20 space-y-6">
+    <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    <p className="text-slate-600 dark:text-slate-300 text-lg">Analizando con IA…</p>
+  </div>
+)}
+
+        
         {/* AI Response Screen */}
         {currentScreen === "response" && (
           <div className="space-y-6">
