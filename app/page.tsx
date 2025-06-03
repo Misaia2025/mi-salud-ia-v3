@@ -776,6 +776,15 @@ export default function MiSaludIA() {
     }
   }, [medicalConditions])
 
+// Dispara el envío a IA en cuanto entramos a la pantalla "confirmation"
+useEffect(() => {
+  if (currentScreen === "confirmation") {
+    handleSubmit()
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [currentScreen])
+  
+  
   const handlePurchaseTokens = (tokensToPurchase: number, price: number) => {
     setIsProcessingPayment(true)
     setCurrentScreen("payment-processing")
