@@ -988,7 +988,8 @@ async function handleSubmit() {
     </div>
   </div>
         )}   {/* cierra modal condicional */}
-)}
+</div>          /* último div del modal */
+)}  
     
     
     <div
