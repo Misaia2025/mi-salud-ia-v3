@@ -947,54 +947,53 @@ async function handleSubmit() {
 
 
   return (
-   <>
-         {showLoginModal && (
-  <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-xl space-y-4 w-80">
-      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-        Inicia sesión
-      </h3>
+  <>
+    {showLoginModal && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl space-y-4 w-80">
+          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
+            Inicia sesión
+          </h3>
 
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault()
-          const email = e.currentTarget.email.value
-          if (email) {
-            await signIn(email)          {/* función helper */}
-            setShowLoginModal(false)
-          }
-        }}
-        className="space-y-3"
-      >
-        <Input
-          name="email"
-          type="email"
-          placeholder="Tu correo"
-          required
-          className="w-full"
-        />
-        <Button type="submit" className="w-full">
-          Enviar enlace
-        </Button>
-      </form>
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              const email = (e.currentTarget.email as HTMLInputElement).value
+              if (email) {
+                await signIn(email)
+                setShowLoginModal(false)
+              }
+            }}
+            className="space-y-3"
+          >
+            <Input
+              name="email"
+              type="email"
+              placeholder="Tu correo"
+              required
+              className="w-full"
+            />
+            <Button type="submit" className="w-full">
+              Enviar enlace
+            </Button>
+          </form>
 
-      <Button
-        variant="ghost"
-        className="w-full"
-        onClick={() => setShowLoginModal(false)}
-      >
-        Cancelar
-      </Button>
-    </div>
-  </div>
-        )}   {/* cierra modal condicional */}
-</div>          /* último div del modal */
-)}  
-    
-    
+          <Button
+            variant="ghost"
+            className="w-full"
+            onClick={() => setShowLoginModal(false)}
+          >
+            Cancelar
+          </Button>
+        </div>
+      </div>
+    )} {/* ← solo ESTE cierre */}
+
     <div
-      className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
+      className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900"
     >
+      {/* resto de tu interfaz */}
+
 
     
 
