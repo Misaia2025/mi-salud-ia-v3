@@ -5,10 +5,10 @@ export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// Magic-link
+// Envío de magic-link
 export async function signIn(email: string) {
   const { error } = await supabase.auth.signInWithOtp({ email });
-  if (error) console.error("Error enviando enlace:", error.message);
+  if (error) console.error("signIn error:", error.message);
 }
 
 // Cerrar sesión
