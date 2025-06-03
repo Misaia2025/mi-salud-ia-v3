@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { signOut } from "@/lib/auth";
 import { useState, useEffect, useRef } from "react"
 // --- Supabase client ---
 import { supabase } from "@/lib/supabase"
@@ -965,9 +965,9 @@ async function handleSubmit() {
 
                   <Button
                     variant="ghost"
-                    onClick={() => {
-                      setShowUserDropdown(false)
-                      alert("Sesión cerrada")
+                    onClick={async () => {
+                      setShowUserDropdown(false);
+                      await signOut();
                     }}
                     className="w-full justify-start px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
                   >
