@@ -944,6 +944,12 @@ async function handleSubmit() {
   setCurrentScreen("response")
 }
 // --------------------------------------------------------------------
+
+
+  return (
+    <div
+      className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
+    >
   {showLoginModal && (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div className="bg-white dark:bg-slate-800 p-6 rounded-xl space-y-4 w-80">
@@ -984,12 +990,6 @@ async function handleSubmit() {
     </div>
   </div>
 )}
-
-  return (
-    <div
-      className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
-    >
-
     
 
       {/* Header */}
