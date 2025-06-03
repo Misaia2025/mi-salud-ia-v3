@@ -5,42 +5,6 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 // --- Supabase client ---
 import { supabase } from "@/lib/supabase"
-import type { User } from "@supabase/supabase-js"
-
-
-// --------- LOGIN / LOGOUT (magic link) ----------
-async function signIn(email: string) {
-  const { error } = await supabase.auth.signInWithOtp({ email })
-  if (error) alert("No pude enviar el enlace: " + error.message)
-  else alert("Revisa tu correo para iniciar sesión.")
-}
-
-async function signOut() {
-  await supabase.auth.signOut()
-  // Reiniciar tokens locales si quieres
-  localStorage.removeItem("anon_id")
-  location.reload()
-}
-
-// --------- TRAER HISTORIAL DESDE SUPABASE ----------
-async function fetchHistory(): Promise<any[]> {
-  const { data: { user } } = await supabase.auth.getUser()
-  const uid = user?.id || localStorage.getItem("anon_id")
-  if (!uid) return []
-
-  const { data, error } = await supabase
-    .from("history")
-    .select("*")
-    .eq("user_id", uid)
-    .order("created_at", { ascending: false })
-
-  if (error) {
-    console.error("Error loading history:", error.message)
-    return []
-  }
-  return data || []
-}
-
 
 // ---------------------------------------------------------
 //  SUPABASE HELPERS: historial + control de tokens
@@ -220,8 +184,6 @@ export default function MiSaludIA() {
   const [editedSymptoms, setEditedSymptoms] = useState("")
   const [transcription, setTranscription] = useState("")
 
-const [showLoginModal, setShowLoginModal] = useState(false)
-  
   // Demographics state
   const [age, setAge] = useState(25)
   const [gender, setGender] = useState<Gender | "">("")
@@ -328,21 +290,6 @@ const [showLoginModal, setShowLoginModal] = useState(false)
   const [editedConditions, setEditedConditions] = useState("")
   const [isEditingConditions, setIsEditingConditions] = useState(false)
   const [symptomsExpanded, setSymptomsExpanded] = useState(false) // Default to closed
-
-  // ---- Estado de sesión Supabase ----
-const [sessionUser, setSessionUser] = useState<User | null>(null)
-
-useEffect(() => {
-  // Escucha cambios de autenticación
-  const { data: listener } = supabase.auth.onAuthStateChange((_evt, sess) => {
-    setSessionUser(sess?.user ?? null)
-  })
-  // Al cargar la página, pregunta si ya hay sesión
-  supabase.auth.getUser().then(({ data }) => setSessionUser(data.user ?? null))
-
-  return () => listener.subscription.unsubscribe()
-}, [])
-
 
   const phoneCountryCodes = [
     { code: "+1", name: "Estados Unidos", flag: "🇺🇸" },
@@ -944,60 +891,11 @@ async function handleSubmit() {
   setCurrentScreen("response")
 }
 // --------------------------------------------------------------------
-
-
- return (
-  <>
-    {/* ---- MODAL DE LOGIN ---- */}
-    {showLoginModal && (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl space-y-4 w-80">
-          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-            Inicia sesión
-          </h3>
-
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault()
-              const email = (e.currentTarget.email as HTMLInputElement).value
-              if (email) {
-                await signIn(email)
-                setShowLoginModal(false)
-              }
-            }}
-            className="space-y-3"
-          >
-            <Input
-              name="email"
-              type="email"
-              placeholder="Tu correo"
-              required
-              className="w-full"
-            />
-            <Button type="submit" className="w-full">
-              Enviar enlace
-            </Button>
-          </form>
-
-          <Button
-            variant="ghost"
-            className="w-full"
-            onClick={() => setShowLoginModal(false)}
-          >
-            Cancelar
-          </Button>
-        </div>
-      </div>
-    )} {/* ← esta )} cierra el condicional; NO pongas nada más aquí */}
-
-    {/* ---- RESTO DE TU INTERFAZ ---- */}
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* …todo el JSX existente de tu app… */}
-
-
-
-    
-
+  
+  return (
+    <div
+      className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
+    >
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 px-6 py-4 sticky top-0 z-50 dark:bg-slate-900/80 dark:border-slate-700/50">
         <div className="max-w-sm mx-auto flex items-center justify-between">
@@ -1259,7 +1157,7 @@ async function handleSubmit() {
               </Button>
               <Button
                 variant="ghost"
-                onClick={() =>setShowLoginModal(true)}
+                onClick={() => setShowAccountModal(true)}
                 className="w-full h-10 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 text-sm"
               >
                 <LogIn className="h-4 w-4 mr-2 text-slate-400" />
@@ -1730,7 +1628,7 @@ async function handleSubmit() {
 {currentScreen === "loading" && (
   <div className="flex flex-col items-center justify-center py-20 space-y-6">
     <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-    <p className="text-slate-600 dark:text-slate-300 text-lg">Analizando con IA Médica…</p>
+    <p className="text-slate-600 dark:text-slate-300 text-lg">Analizando con IA…</p>
   </div>
 )}
 
