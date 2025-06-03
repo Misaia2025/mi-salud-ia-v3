@@ -5,6 +5,43 @@ import type React from "react"
 import { useState, useEffect, useRef } from "react"
 // --- Supabase client ---
 import { supabase } from "@/lib/supabase"
+import type { User } from "@supabase/supabase-js"
+import { Input } from "@/components/ui/input"
+
+
+// --------- LOGIN / LOGOUT (magic link) ----------
+async function signIn(email: string) {
+  const { error } = await supabase.auth.signInWithOtp({ email })
+  if (error) alert("No pude enviar el enlace: " + error.message)
+  else alert("Revisa tu correo para iniciar sesión.")
+}
+
+async function signOut() {
+  await supabase.auth.signOut()
+  // Reiniciar tokens locales si quieres
+  localStorage.removeItem("anon_id")
+  location.reload()
+}
+
+// --------- TRAER HISTORIAL DESDE SUPABASE ----------
+async function fetchHistory(): Promise<any[]> {
+  const { data: { user } } = await supabase.auth.getUser()
+  const uid = user?.id || localStorage.getItem("anon_id")
+  if (!uid) return []
+
+  const { data, error } = await supabase
+    .from("history")
+    .select("*")
+    .eq("user_id", uid)
+    .order("created_at", { ascending: false })
+
+  if (error) {
+    console.error("Error loading history:", error.message)
+    return []
+  }
+  return data || []
+}
+
 
 // ---------------------------------------------------------
 //  SUPABASE HELPERS: historial + control de tokens
@@ -290,6 +327,21 @@ export default function MiSaludIA() {
   const [editedConditions, setEditedConditions] = useState("")
   const [isEditingConditions, setIsEditingConditions] = useState(false)
   const [symptomsExpanded, setSymptomsExpanded] = useState(false) // Default to closed
+
+  // ---- Estado de sesión Supabase ----
+const [sessionUser, setSessionUser] = useState<User | null>(null)
+
+useEffect(() => {
+  // Escucha cambios de autenticación
+  const { data: listener } = supabase.auth.onAuthStateChange((_evt, sess) => {
+    setSessionUser(sess?.user ?? null)
+  })
+  // Al cargar la página, pregunta si ya hay sesión
+  supabase.auth.getUser().then(({ data }) => setSessionUser(data.user ?? null))
+
+  return () => listener.subscription.unsubscribe()
+}, [])
+
 
   const phoneCountryCodes = [
     { code: "+1", name: "Estados Unidos", flag: "🇺🇸" },
@@ -896,6 +948,36 @@ async function handleSubmit() {
     <div
       className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
     >
+
+    {/* LOGIN / LOGOUT PANEL */}
+<div className="fixed top-4 right-4 z-50">
+  {sessionUser ? (
+    <Button variant="outline" size="sm" onClick={signOut}>
+      Cerrar sesión
+    </Button>
+  ) : (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault()
+        const email = e.currentTarget.email.value
+        if (email) signIn(email)
+      }}
+      className="flex space-x-2"
+    >
+      <Input
+        name="email"
+        type="email"
+        placeholder="Tu email"
+        className="h-8 w-36"
+        required
+      />
+      <Button size="sm" type="submit">
+        Entrar
+      </Button>
+    </form>
+  )}
+</div>
+
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/50 px-6 py-4 sticky top-0 z-50 dark:bg-slate-900/80 dark:border-slate-700/50">
         <div className="max-w-sm mx-auto flex items-center justify-between">
