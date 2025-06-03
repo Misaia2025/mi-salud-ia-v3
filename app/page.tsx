@@ -843,6 +843,46 @@ export default function MiSaludIA() {
 
   const isAnyEditing = isEditingSymptoms || isEditingAge || isEditingGender || isEditingConditions
 
+
+// --------------------------------------------------------------------
+//                     FUNCIÓN handleSubmit (nueva)
+// --------------------------------------------------------------------
+async function handleSubmit() {
+  // 1️⃣ Cambiar a pantalla de carga
+  setCurrentScreen("loading")
+
+  // 2️⃣ Llamar a tu backend DeepSeek
+  const res = await fetch("/api/deepseek", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      symptoms: userSymptoms,
+      age,
+      sex: gender,
+      conditions,
+    }),
+  })
+  const { text } = await res.json()
+  setAiResponse(text) // mostrar respuesta IA
+
+  // 3️⃣ Guardar en Supabase + contar tokens
+  const { used } = await saveConsultation({
+    symptoms: userSymptoms,
+    age,
+    sex: gender,
+    conditions,
+    aiText: text,
+  })
+  if (used > 2) {
+    setCurrentScreen("token-limit")
+    return // detenemos aquí
+  }
+
+  // 4️⃣ Mostrar pantalla de resultado
+  setCurrentScreen("response")
+}
+// --------------------------------------------------------------------
+  
   return (
     <div
       className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
